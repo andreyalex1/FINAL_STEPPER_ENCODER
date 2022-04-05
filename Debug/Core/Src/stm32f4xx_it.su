@@ -1,0 +1,16 @@
+stm32f4xx_it.c:109:6:NMI_Handler	4	static
+stm32f4xx_it.c:124:6:HardFault_Handler	4	static
+stm32f4xx_it.c:139:6:MemManage_Handler	4	static
+stm32f4xx_it.c:154:6:BusFault_Handler	4	static
+stm32f4xx_it.c:169:6:UsageFault_Handler	4	static
+stm32f4xx_it.c:184:6:SVC_Handler	4	static
+stm32f4xx_it.c:197:6:DebugMon_Handler	4	static
+stm32f4xx_it.c:210:6:PendSV_Handler	4	static
+stm32f4xx_it.c:223:6:SysTick_Handler	8	static
+stm32f4xx_it.c:244:6:CAN1_RX0_IRQHandler	8	static
+stm32f4xx_it.c:259:6:TIM2_IRQHandler	8	static
+stm32f4xx_it.c:273:6:TIM7_IRQHandler	40	static
+stm32f4xx_it.c:371:6:My_CAN_Rx_Handler	24	static
+stm32f4xx_it.c:391:7:read_angle	48	static
+stm32f4xx_it.c:409:7:Ticks_To_Angle	16	static
+stm32f4xx_it.c:413:5:Angle_To_CAN_Data	32	static
