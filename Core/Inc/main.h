@@ -67,6 +67,10 @@ void Error_Handler(void);
 #define STEPPER_PWM_PRESCALER (24)		// clock speed (80000000) divided by (this + 1) = pwm timer speed
 #define GEAR_RATIO (50.0) 				// reductor gear ratio
 #define APB1_TIMER_CLOCK_FREQUENCY (80000000.0)// frequency of the APB1 clock
+//parameters of the tim7
+#define USER_TIMER_PRESCALER (49)
+#define USER_TIMER_PERIOD (15999)
+#define USER_TIMER_FREQUENCY (100)
 
 
 #define READ 0x01

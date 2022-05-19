@@ -82,6 +82,7 @@ float read_angle();	// reads current encoder angle (converted to rad)
 
 float Ticks_To_Angle(int ticks);		// convert encoder ticks to absolute angle
 int Angle_To_CAN_Data(float angle, float speed, char goal_status, char stall_status ,uint8_t* TxData); // convert angle to CAN message
+
 /* USER CODE END PFP */
 
 /* Private user code ---------------------------------------------------------*/
@@ -279,7 +280,7 @@ void TIM7_IRQHandler(void)
 	angle_rad = read_angle();
 	// calculate velocity
 	if(abs(angle_rad_prev - angle_rad) < M_PI ){
-		velocity = (angle_rad - angle_rad_prev) * 20;
+		velocity = (angle_rad - angle_rad_prev) * USER_TIMER_FREQUENCY;
 	}
 	// change direction based on required motor velocity
 	if(target_velocity < 0){
@@ -295,7 +296,9 @@ void TIM7_IRQHandler(void)
 	// calculate target velocity in ticks/s with current step value
 	float temp1 =  target_velocity > 0 ? target_velocity : (-1) * target_velocity;
 	float temp2 =  angle_rad - target_angle > 0 ? angle_rad - target_angle : (-1) * (angle_rad - target_angle);
-	if(temp2 * 17.0  < sqrt(temp1) || temp1 < 0.001 && temp2 < 0.1){
+	float temp3 = angle_rad + (2*M_PI - target_angle) > target_angle + (2*M_PI - angle_rad) ? target_angle + (2*M_PI - angle_rad) : angle_rad + (2*M_PI - target_angle);
+	float angle_difference = temp2 > temp3 ? temp3 : temp2;
+	if(angle_difference * USER_TIMER_FREQUENCY * 0.8  < sqrt(temp1) || temp1 < 0.001 && temp2 < 0.1){
 //		target_velocity_ticks = (target_velocity > 0 ? target_velocity : -1 * target_velocity)  * stepper_step_denominator * 100.0 * GEAR_RATIO/ M_PI;
 		target_velocity_ticks = 0 ;
 		target_velocity = 0;
@@ -372,16 +375,17 @@ void My_CAN_Rx_Handler( CAN_RxHeaderTypeDef* RxHeader, uint8_t* RxData){
 	flag_tim7 = 0;
 	if(RxHeader->StdId == MY_CAN_ID){	// checks received ID against this device's ID
 		// what to do
-		__fp16* temp_float16 = RxData;
-//		float* temp = RxData;
-		target_angle = *temp_float16;
+//		__fp16* temp_float16 = RxData;
+		float* temp = RxData;
+//		target_angle = *temp_float16;
+		target_angle = *temp;
+	//	if(isnan(target_angle)){
+	//		target_velocity = 0.0;
+	//	}
+		temp = RxData + 4;
 
-		f16_tester = *temp_float16;
-
-		temp_float16 = RxData + 2;
-
-
-		target_velocity = *temp_float16;
+//		target_velocity = *temp_float16;
+		target_velocity = *temp;
 		goal_status = 0;
 //		ticks_to_make = Angle_To_Ticks(target_angle_rad);	// change target ticks value
 	}
@@ -410,6 +414,8 @@ float Ticks_To_Angle(int ticks){
 	return  (ticks)* M_PI * 2.0  / 4096.0;
 }
 
+
+
 int Angle_To_CAN_Data(float angle, float speed, char goal_status, char stall_status ,uint8_t* TxData){
 	// pack angle
 	__fp16 temp_float16 = angle;
@@ -433,6 +439,8 @@ int Angle_To_CAN_Data(float angle, float speed, char goal_status, char stall_sta
 */
 	return 1;
 }
+
+
 
 /* USER CODE END 1 */
 

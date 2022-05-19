@@ -63,6 +63,7 @@ CAN_RxHeaderTypeDef   RxHeader;		// header received by can bus
 int CAN_Header_Config(CAN_TxHeaderTypeDef* TxHeader);	// Configures CAN message header.
 int CAN_Filter_Config(CAN_FilterTypeDef* canfilterconfig);	// COnfigures filter for CAN message reception
 int CAN_Starter(CAN_HandleTypeDef* hcan,CAN_FilterTypeDef* canfilterconfig);	//Starts CAN transmittions and receptions
+void configure_tim7(); // configures tim7 prescaler and period, not updated during code genetration
 
 
 // Variables for motor control and feedback
@@ -166,6 +167,7 @@ int main(void)
     CAN_Starter(&hcan1, &canfilterconfig); // starts can
 
     // enable user timer interrupt
+    configure_tim7();
     HAL_TIM_Base_Start_IT(&htim7);
     HAL_TIM_Base_Start_IT(&htim2);
     //start motor PWM
@@ -550,7 +552,7 @@ int CAN_Starter(CAN_HandleTypeDef* hcan,CAN_FilterTypeDef* canfilterconfig){
 			Error_Handler();
 		}
 		if (HAL_CAN_ActivateNotification(hcan, CAN_IT_RX_FIFO0_MSG_PENDING) != HAL_OK){	// attempting to enable CAN interrupts.
-			Error_Handler();																// CAN1_RX0_IRQHandler() is called when an interrupt is triggered
+			Error_Handler();								// CAN1_RX0_IRQHandler() is called when an interrupt is triggered
 		}
 	return 1;
 }
@@ -598,6 +600,12 @@ uint16_t RegAccess(uint8_t operation, uint8_t address, uint16_t value)
   received &= ~0xF000; // clear upper 4 bits, leave lower 12 bits
 
   return received;
+}
+
+void configure_tim7(){
+	TIM7->PSC = USER_TIMER_PRESCALER;
+	TIM7->ARR = USER_TIMER_PERIOD;
+	return;
 }
 /* USER CODE END 4 */
 
